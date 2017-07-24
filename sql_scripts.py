@@ -39,3 +39,11 @@ def add_new_domain(domain_list):
             cur.execute('INSERT INTO domains (domain_key, domain_white) VALUES(?, ?)', (domain, 0))
             db.commit()
     terminate(db)
+
+def get_domains_by_name(value):
+    db = connect()
+    cur = db.cursor()
+    cur.execute("SELECT domain_key FROM domains WHERE domain_key LIKE ?", ['%'+value+'%'])
+    data = cur.fetchall()
+    terminate(db)
+    return data
