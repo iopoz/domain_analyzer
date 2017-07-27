@@ -14,7 +14,6 @@ class SimpleDomainTestCase(unittest.TestCase):
         self.driver.get("https://domainpunch.com/tlds/daily.php")
         self.domain_list = []
         self.last_page = 0
-        self.matches = None
 
     def test_collect(self, page=2):
         self.wait.until_not(EC.visibility_of_element_located((By.ID, 'domtable_processing')))
@@ -34,12 +33,15 @@ class SimpleDomainTestCase(unittest.TestCase):
             return
         self.test_collect(page + 1)
 
-    def test_find_white_domains(self):
-        self.matches = sql.get_domains_by_name('20')
-        pass
-
     def tearDown(self):
         self.driver.close()
+
+
+def suite():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(SimpleDomainTestCase, 'test'))
+    return suite
+
 
 if __name__ == "__main__":
     unittest.main()

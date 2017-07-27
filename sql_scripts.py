@@ -19,6 +19,7 @@ def connect():
                     'domain_white INTEGER);')
     return db
 
+
 def terminate(db):
     try:
         if db:
@@ -40,10 +41,36 @@ def add_new_domain(domain_list):
             db.commit()
     terminate(db)
 
+
 def get_domains_by_name(value):
     db = connect()
     cur = db.cursor()
-    cur.execute("SELECT domain_key FROM domains WHERE domain_key LIKE ?", ['%'+value+'%'])
+    cur.execute("SELECT domain_key FROM domains WHERE domain_key LIKE ?", ['%' + value + '%'])
+    data = cur.fetchall()
+    terminate(db)
+    return data
+
+
+def mark_as_white(white_list):
+    db = connect()
+    cur = db.cursor()
+    for value in white_list:
+        cur.execute("UPDATE domains SET domain_white = 1 WHERE domain_key = ?", [value])
+        db.commit()
+    terminate(db)
+
+def mark_as_black(white_list):
+    db = connect()
+    cur = db.cursor()
+    for value in white_list:
+        cur.execute("UPDATE domains SET domain_white = 2 WHERE domain_key = ?", [value])
+        db.commit()
+    terminate(db)
+
+def get_domains_for_driver(value):
+    db = connect()
+    cur = db.cursor()
+    cur.execute("SELECT domain_key FROM domains WHERE domain_key LIKE ? AND domain_white = 2", ['%' + value + '%'])
     data = cur.fetchall()
     terminate(db)
     return data
