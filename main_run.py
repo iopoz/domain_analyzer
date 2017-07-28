@@ -1,15 +1,9 @@
-import os
+import sys
 import unittest
 
-import sys
+import src.sql_scripts as sql
 
-import sql_scripts as sql
-import test_get_data
-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from src import test_get_data, test_get_page_from_browser
 
 matches = 0
 
@@ -17,7 +11,7 @@ matches = 0
 def find_white_domains(param, path):
     global matches
     white_list = []
-    strange_domains_list=[]
+    strange_domains_list = []
     temp_list = []
     matches = sql.get_domains_by_name(param)
     try:
@@ -31,10 +25,17 @@ def find_white_domains(param, path):
             else:
                 strange_domains_list.append(match[0])
         sql.mark_as_white(white_list)
-        sql.mark_as_black(strange_domains_list)
+        with open('temp.txt', 'x') as black_list:
+            for domain in strange_domains_list:
+                black_list.write(domain + '\n')
+        black_list.close()
     except:
         print('Mistake in path')
 
+
+def get_pages():
+    suite = unittest.TestLoader().loadTestsFromModule(test_get_page_from_browser)
+    unittest.TextTestRunner(verbosity=2).run(suite)
 
 
 def main(arg1=False, arg2=20, arg3='white_list.txt'):
@@ -42,6 +43,7 @@ def main(arg1=False, arg2=20, arg3='white_list.txt'):
         suite = unittest.TestLoader().loadTestsFromModule(test_get_data)
         unittest.TextTestRunner(verbosity=2).run(suite)
     find_white_domains(str(arg2), arg3)
+    get_pages()
 
 
 if __name__ == "__main__":
